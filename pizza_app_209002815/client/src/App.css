@@ -112,6 +112,57 @@
   font-size: 16px;
 }
 
+@media (max-width: 520px) {
+  .app {
+    padding: 16px 14px 48px;
+  }
+
+  .app-header {
+    padding: 18px 18px 20px;
+  }
+
+  .app-title {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .app-logo {
+    font-size: 34px;
+  }
+
+  .app-header h1 {
+    font-size: 20px;
+  }
+
+  .app-subtitle {
+    font-size: 13px;
+  }
+
+  .tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 9px 8px;
+    font-size: 13px;
+    justify-content: center;
+  }
+
+  section {
+    padding: 16px;
+  }
+
+  .lookup-row {
+    flex-wrap: wrap;
+  }
+
+  .lookup-row button {
+    width: 100%;
+  }
+}
+
 /* ---------- Generic layout ---------- */
 
 section {
@@ -134,6 +185,8 @@ section h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 14px;
 }
 
@@ -180,6 +233,7 @@ code {
   font-size: 0.85em;
   direction: ltr;
   display: inline-block;
+  word-break: break-all;
 }
 
 /* ---------- Menu display ---------- */
@@ -567,6 +621,7 @@ legend {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 10px;
 }
 
@@ -574,6 +629,7 @@ legend {
   margin: 0;
   font-size: 13px;
   color: var(--color-text-muted);
+  min-width: 0;
 }
 
 .order-card-customer {
@@ -623,6 +679,7 @@ legend {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
   margin-top: 12px;
 }
 
