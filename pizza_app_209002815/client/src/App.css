@@ -1,0 +1,119 @@
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+  direction: rtl;
+  text-align: right;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  border-bottom-color: #b5322f;
+  font-weight: bold;
+}
+
+section {
+  background: #fff;
+  border: 1px solid #e2e0da;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin: 8px 0;
+}
+
+input,
+select {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  margin-top: 4px;
+}
+
+fieldset {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
+.menu-display {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.menu-display h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.topping-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  margin-inline-end: 12px;
+}
+
+button {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #b5322f;
+  background: #b5322f;
+  color: #fff;
+  font-size: 15px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-row button {
+  margin-top: 6px;
+}
+
+.error-text {
+  color: #b5322f;
+  font-weight: bold;
+}
+
+.hint {
+  color: #777;
+  font-size: 13px;
+}
+
+.order-confirmation {
+  border-color: #2f7a3f;
+  background: #f1faf2;
+}
