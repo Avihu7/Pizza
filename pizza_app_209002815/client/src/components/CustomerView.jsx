@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createOrder, getOrder } from "../api";
+import StatusBadge from "./StatusBadge";
 
 const MAX_TOPPINGS_PER_PIZZA = 3;
 const MAX_PIZZAS_PER_ORDER = 5;
@@ -43,27 +44,29 @@ function PizzaBuilder({ menu, onAddToCart, disabled }) {
 
   return (
     <div className="pizza-builder">
-      <label>
-        פיצה
-        <select value={pizzaId} onChange={(e) => setPizzaId(e.target.value)}>
-          {menu.pizzas.map((pizza) => (
-            <option key={pizza.id} value={pizza.id}>
-              {pizza.name} (₪{pizza.price})
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="builder-grid">
+        <label>
+          פיצה
+          <select value={pizzaId} onChange={(e) => setPizzaId(e.target.value)}>
+            {menu.pizzas.map((pizza) => (
+              <option key={pizza.id} value={pizza.id}>
+                {pizza.name} (₪{pizza.price})
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <label>
-        גודל
-        <select value={sizeId} onChange={(e) => setSizeId(e.target.value)}>
-          {menu.sizes.map((size) => (
-            <option key={size.id} value={size.id}>
-              {size.name} (+₪{size.price})
-            </option>
-          ))}
-        </select>
-      </label>
+        <label>
+          גודל
+          <select value={sizeId} onChange={(e) => setSizeId(e.target.value)}>
+            {menu.sizes.map((size) => (
+              <option key={size.id} value={size.id}>
+                {size.name} (+₪{size.price})
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <fieldset>
         <legend>תוספות (עד {MAX_TOPPINGS_PER_PIZZA})</legend>
@@ -83,14 +86,15 @@ function PizzaBuilder({ menu, onAddToCart, disabled }) {
         ))}
       </fieldset>
 
-      <p>
-        מחיר משוער לפיצה זו: ₪
-        {calculatePizzaPrice(menu, pizzaId, sizeId, toppingIds).toFixed(2)}
-      </p>
-
-      <button type="button" onClick={handleAdd} disabled={disabled}>
-        הוסף לעגלה
-      </button>
+      <div className="builder-footer">
+        <span className="builder-price">
+          מחיר משוער לפיצה זו:{" "}
+          <strong>₪{calculatePizzaPrice(menu, pizzaId, sizeId, toppingIds).toFixed(2)}</strong>
+        </span>
+        <button type="button" className="btn btn-primary" onClick={handleAdd} disabled={disabled}>
+          ➕ הוסף לעגלה
+        </button>
+      </div>
       {disabled && (
         <p className="error-text">לא ניתן להוסיף יותר מ-{MAX_PIZZAS_PER_ORDER} פיצות להזמנה</p>
       )}
@@ -114,32 +118,41 @@ function describePizza(menu, item) {
 function MenuDisplay({ menu }) {
   return (
     <div className="menu-display">
-      <div>
-        <h3>פיצות</h3>
+      <div className="menu-group">
+        <h3>
+          <span aria-hidden="true">🍕</span> פיצות
+        </h3>
         <ul>
           {menu.pizzas.map((pizza) => (
             <li key={pizza.id}>
-              {pizza.name} - ₪{pizza.price}
+              <span>{pizza.name}</span>
+              <span className="menu-price">₪{pizza.price}</span>
             </li>
           ))}
         </ul>
       </div>
-      <div>
-        <h3>גדלים</h3>
+      <div className="menu-group">
+        <h3>
+          <span aria-hidden="true">📐</span> גדלים
+        </h3>
         <ul>
           {menu.sizes.map((size) => (
             <li key={size.id}>
-              {size.name} - +₪{size.price}
+              <span>{size.name}</span>
+              <span className="menu-price">+₪{size.price}</span>
             </li>
           ))}
         </ul>
       </div>
-      <div>
-        <h3>תוספות</h3>
+      <div className="menu-group">
+        <h3>
+          <span aria-hidden="true">✨</span> תוספות
+        </h3>
         <ul>
           {menu.toppings.map((topping) => (
             <li key={topping.id}>
-              {topping.name} - +₪{topping.price}
+              <span>{topping.name}</span>
+              <span className="menu-price">+₪{topping.price}</span>
             </li>
           ))}
         </ul>
@@ -151,10 +164,19 @@ function MenuDisplay({ menu }) {
 function OrderConfirmation({ order }) {
   return (
     <div data-testid="order-confirmation" className="order-confirmation">
-      <h3>ההזמנה נשלחה בהצלחה</h3>
-      <p>מספר הזמנה: {order.id}</p>
-      <p>מצב הזמנה: {order.status}</p>
-      <p>מחיר כולל: ₪{order.totalPrice.toFixed(2)}</p>
+      <div className="order-confirmation-icon" aria-hidden="true">✓</div>
+      <div>
+        <h3>ההזמנה נשלחה בהצלחה!</h3>
+        <p className="confirmation-row">
+          מספר הזמנה: <code>{order.id}</code>
+        </p>
+        <p className="confirmation-row">
+          מצב הזמנה: <StatusBadge status={order.status} />
+        </p>
+        <p className="confirmation-row">
+          מחיר כולל: <strong>₪{order.totalPrice.toFixed(2)}</strong>
+        </p>
+      </div>
     </div>
   );
 }
@@ -254,18 +276,29 @@ export default function CustomerView({ menu }) {
 
       <section data-testid="cart" className="cart">
         <h2>עגלת הזמנה</h2>
-        {cart.length === 0 && <p>העגלה ריקה</p>}
-        <ul>
+        {cart.length === 0 && (
+          <p className="empty-state">🛒 העגלה ריקה - הוסיפו פיצה מהבנאי למעלה</p>
+        )}
+        <ul className="cart-list">
           {cart.map((item) => {
             const { title, toppingsText, price } = describePizza(menu, item);
             return (
-              <li key={item.key}>
-                <span>
-                  {title} - {toppingsText} - ₪{price.toFixed(2)}
-                </span>
-                <button type="button" onClick={() => removeFromCart(item.key)}>
-                  הסר
-                </button>
+              <li key={item.key} className="cart-row">
+                <div>
+                  <p className="cart-item-title">{title}</p>
+                  <p className="cart-item-toppings">{toppingsText}</p>
+                </div>
+                <div className="cart-row-end">
+                  <span className="cart-item-price">₪{price.toFixed(2)}</span>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label="הסר פריט"
+                    onClick={() => removeFromCart(item.key)}
+                  >
+                    ✕
+                  </button>
+                </div>
               </li>
             );
           })}
@@ -274,44 +307,53 @@ export default function CustomerView({ menu }) {
 
       <section data-testid="order-summary-panel" className="order-summary-panel">
         <h2>סיכום הזמנה</h2>
-        <ul>
-          {cart.map((item) => {
-            const { title, price } = describePizza(menu, item);
-            return (
-              <li key={item.key}>
-                {title}: ₪{price.toFixed(2)}
-              </li>
-            );
-          })}
-        </ul>
-        <p>
-          <strong>מחיר משוער כולל: ₪{total.toFixed(2)}</strong>
-        </p>
+        {cart.length === 0 ? (
+          <p className="empty-state">אין עדיין פריטים בהזמנה</p>
+        ) : (
+          <ul className="summary-list">
+            {cart.map((item) => {
+              const { title, price } = describePizza(menu, item);
+              return (
+                <li key={item.key}>
+                  <span>{title}</span>
+                  <span>₪{price.toFixed(2)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <div className="summary-total">
+          <span>מחיר משוער כולל</span>
+          <strong>₪{total.toFixed(2)}</strong>
+        </div>
         <p className="hint">המחיר הסופי מחושב ומוצג בשרת לאחר שליחת ההזמנה</p>
 
-        <label>
-          שם מלא
-          <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
-        </label>
-        <label>
-          טלפון
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} />
-        </label>
-        <label>
-          כתובת למשלוח
-          <input
-            value={deliveryAddress}
-            onChange={(e) => setDeliveryAddress(e.target.value)}
-          />
-        </label>
+        <div className="form-grid">
+          <label>
+            שם מלא
+            <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+          </label>
+          <label>
+            טלפון
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </label>
+          <label>
+            כתובת למשלוח
+            <input
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+            />
+          </label>
+        </div>
 
         <button
           type="button"
+          className="btn btn-primary btn-block"
           data-testid="checkout-button"
           onClick={handleCheckout}
           disabled={!canCheckout}
         >
-          {isSubmitting ? "שולח..." : "בצע תשלום מדומה ושלח הזמנה"}
+          {isSubmitting ? "שולח..." : "💳 בצע תשלום מדומה ושלח הזמנה"}
         </button>
         {submitError && <p className="error-text">{submitError}</p>}
       </section>
@@ -320,17 +362,25 @@ export default function CustomerView({ menu }) {
 
       <section className="order-lookup">
         <h2>בדיקת מצב הזמנה</h2>
-        <label>
-          מזהה הזמנה
-          <input value={lookupId} onChange={(e) => setLookupId(e.target.value)} />
-        </label>
-        <button type="button" onClick={handleLookup} disabled={!lookupId.trim()}>
-          בדוק מצב
-        </button>
+        <div className="lookup-row">
+          <label>
+            מזהה הזמנה
+            <input value={lookupId} onChange={(e) => setLookupId(e.target.value)} />
+          </label>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleLookup}
+            disabled={!lookupId.trim()}
+          >
+            בדוק מצב
+          </button>
+        </div>
         {lookupError && <p className="error-text">{lookupError}</p>}
         {lookupResult && (
-          <p>
-            מצב הזמנה {lookupResult.id}: {lookupResult.status}
+          <p className="lookup-result">
+            מצב הזמנה <code>{lookupResult.id}</code>:{" "}
+            <StatusBadge status={lookupResult.status} />
           </p>
         )}
       </section>

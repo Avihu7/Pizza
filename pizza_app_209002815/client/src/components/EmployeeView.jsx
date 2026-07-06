@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { getOrders, updateOrderStatus } from "../api";
+import StatusBadge from "./StatusBadge";
 
 const NEXT_STATUS = {
   new: "preparing",
@@ -7,16 +8,14 @@ const NEXT_STATUS = {
 };
 
 const ACTION_LABEL = {
-  new: "התחל הכנה",
-  preparing: "סמן כמוכן",
+  new: "▶️ התחל הכנה",
+  preparing: "✅ סמן כמוכן",
 };
 
-function describePizzaLine(pizza) {
-  const toppingsText =
-    pizza.toppings.length > 0
-      ? pizza.toppings.map((t) => t.name).join(", ")
-      : "ללא תוספות";
-  return `${pizza.pizzaName} (${pizza.sizeName}) - ${toppingsText}`;
+function describeToppings(pizza) {
+  return pizza.toppings.length > 0
+    ? pizza.toppings.map((t) => t.name).join(", ")
+    : "ללא תוספות";
 }
 
 export default function EmployeeView() {
@@ -54,29 +53,46 @@ export default function EmployeeView() {
 
   return (
     <section data-testid="employee-orders" className="employee-orders">
-      <h2>הזמנות פעילות</h2>
-      <button type="button" onClick={loadOrders}>
-        רענן רשימה
-      </button>
-      {loadError && <p className="error-text">{loadError}</p>}
-      {orders.length === 0 && <p>אין הזמנות פעילות כרגע</p>}
-      <ul>
+      <div className="section-header">
+        <h2>הזמנות פעילות</h2>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={loadOrders}>
+          🔄 רענן רשימה
+        </button>
+      </div>
+      {loadError && <p className="error-banner">{loadError}</p>}
+      {orders.length === 0 && (
+        <p className="empty-state">👨‍🍳 אין הזמנות פעילות כרגע</p>
+      )}
+      <ul className="order-card-list">
         {orders.map((order) => (
-          <li key={order.id} className="order-row">
-            <p>
-              הזמנה {order.id} - {order.customerName}
-            </p>
+          <li key={order.id} className="order-card">
+            <div className="order-card-header">
+              <div>
+                <p className="order-card-id">
+                  הזמנה <code>{order.id}</code>
+                </p>
+                <p className="order-card-customer">{order.customerName}</p>
+              </div>
+              <StatusBadge status={order.status} />
+            </div>
+
             <ul className="pizza-lines">
               {order.pizzas.map((pizza, index) => (
-                <li key={index}>{describePizzaLine(pizza)}</li>
+                <li key={index}>
+                  <span className="pizza-line-name">
+                    {pizza.pizzaName} ({pizza.sizeName})
+                  </span>
+                  <span className="pizza-line-toppings">{describeToppings(pizza)}</span>
+                </li>
               ))}
             </ul>
-            <p>
-              מחיר: ₪{order.totalPrice.toFixed(2)} | מצב: {order.status}
-            </p>
-            <button type="button" onClick={() => handleAdvance(order)}>
-              {ACTION_LABEL[order.status]}
-            </button>
+
+            <div className="order-card-footer">
+              <span className="order-card-price">₪{order.totalPrice.toFixed(2)}</span>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => handleAdvance(order)}>
+                {ACTION_LABEL[order.status]}
+              </button>
+            </div>
             {errorsByOrderId[order.id] && (
               <p className="error-text">{errorsByOrderId[order.id]}</p>
             )}
