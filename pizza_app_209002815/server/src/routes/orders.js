@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const { validateOrderPayload } = require("../validation/orderValidation");
 const { buildOrderPizzas, calculateTotalPrice } = require("../services/pricing");
 const { addOrder, getOrderById, getOrders } = require("../data/orders");
+const { isKnownStatus, canTransition } = require("../services/orderStatus");
 
 const router = express.Router();
 
@@ -48,6 +49,27 @@ router.get("/:id", (req, res) => {
   if (!order) {
     return res.status(404).json({ error: "Order not found" });
   }
+  res.status(200).json(order);
+});
+
+router.patch("/:id/status", (req, res) => {
+  const order = getOrderById(req.params.id);
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  const { status: nextStatus } = req.body;
+  if (!isKnownStatus(nextStatus)) {
+    return res.status(400).json({ error: `Unknown status "${nextStatus}"` });
+  }
+
+  if (!canTransition(order.status, nextStatus)) {
+    return res.status(409).json({
+      error: `Cannot transition order from "${order.status}" to "${nextStatus}"`,
+    });
+  }
+
+  order.status = nextStatus;
   res.status(200).json(order);
 });
 
