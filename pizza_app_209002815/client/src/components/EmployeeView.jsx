@@ -11,6 +11,14 @@ const ACTION_LABEL = {
   preparing: "סמן כמוכן",
 };
 
+function describePizzaLine(pizza) {
+  const toppingsText =
+    pizza.toppings.length > 0
+      ? pizza.toppings.map((t) => t.name).join(", ")
+      : "ללא תוספות";
+  return `${pizza.pizzaName} (${pizza.sizeName}) - ${toppingsText}`;
+}
+
 export default function EmployeeView() {
   const [orders, setOrders] = useState([]);
   const [errorsByOrderId, setErrorsByOrderId] = useState({});
@@ -58,9 +66,11 @@ export default function EmployeeView() {
             <p>
               הזמנה {order.id} - {order.customerName}
             </p>
-            <p>
-              {order.pizzas.map((p) => `${p.pizzaName} (${p.sizeName})`).join(", ")}
-            </p>
+            <ul className="pizza-lines">
+              {order.pizzas.map((pizza, index) => (
+                <li key={index}>{describePizzaLine(pizza)}</li>
+              ))}
+            </ul>
             <p>
               מחיר: ₪{order.totalPrice.toFixed(2)} | מצב: {order.status}
             </p>
